@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wikipedia: The Family Tree</title>
+  <style>
+    /* Global styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #f6f6f6;
+      font-family: 'Linux Libertine', 'Georgia', 'Times', serif;
+      line-height: 1.6;
+      color: #202122;
+      padding: 20px 10px;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto 30px auto;
+      background: white;
+      border: 1px solid #a2a9b1;
+      padding: 30px 35px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      page-break-after: always;
+      border-radius: 2px;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Linux Libertine', 'Georgia', serif;
+      font-weight: normal;
+      border-bottom: 1px solid #a2a9b1;
+      padding-bottom: 4px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-top: 0;
+      border-bottom: 3px solid #a2a9b1;
+    }
+
+    h2 {
+      font-size: 2rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+    }
+
+    a {
+      color: #3366cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .box {
+      border: 1px solid #a2a9b1;
+      background: #f8f9fa;
+      padding: 16px 20px;
+      margin: 20px 0;
+      border-radius: 2px;
+    }
+
+    .box img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 10px auto;
+    }
+
+    .box .caption {
+      font-size: 0.9rem;
+      color: #202122;
+      margin-top: 8px;
+    }
+
+    .green {
+      color: #1e7e34;
+    }
+
+    .blue-link {
+      color: #3366cc;
+    }
+
+    /* Andre's name styling: red glow + rapid shake + periodic 360 spin */
+    .andre-name {
+      color: #cc0000;
+      text-shadow: 0 0 8px rgba(204, 0, 0, 0.9), 0 0 16px rgba(204, 0, 0, 0.6);
+      display: inline-block;
+      animation: rapidShake 0.08s infinite, periodicSpin 2s infinite;
+    }
+
+    @keyframes rapidShake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      20% { transform: translate(-2px, -1px) rotate(-1deg); }
+      40% { transform: translate(-1px, 2px) rotate(1deg); }
+      60% { transform: translate(2px, -1px) rotate(0deg); }
+      80% { transform: translate(-1px, 1px) rotate(-1deg); }
+      100% { transform: translate(1px, -2px) rotate(1deg); }
+    }
+
+    /* Periodic 360 spin using a separate keyframe that only applies rotation briefly */
+    @keyframes periodicSpin {
+      0% { transform: rotate(0deg); }
+      40% { transform: rotate(0deg); }
+      45% { transform: rotate(360deg); }
+      55% { transform: rotate(360deg); }
+      60% { transform: rotate(0deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    /* To combine shake and spin, we need a wrapper or use two animations.
+       We'll use a wrapper for the shaking, and the inner element for spinning.
+       But the user wants the name itself to shake AND spin periodically.
+       Let's do it with a single element using two animations with different durations. */
+    .andre-name-combo {
+      color: #cc0000;
+      text-shadow: 0 0 8px rgba(204, 0, 0, 0.9), 0 0 16px rgba(204, 0, 0, 0.6);
+      display: inline-block;
+      animation: rapidShake 0.08s infinite, spinPulse 2s infinite;
+    }
+
+    @keyframes spinPulse {
+      0% { transform: rotate(0deg); }
+      40% { transform: rotate(0deg); }
+      45% { transform: rotate(360deg); }
+      55% { transform: rotate(360deg); }
+      60% { transform: rotate(0deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .stretched {
+      display: inline-block;
+      transform: scaleX(1.6);
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+
+    .stretched-light {
+      display: inline-block;
+      transform: scaleX(1.3);
+      letter-spacing: 0.5px;
+      font-weight: bold;
+    }
+
+    .bold-black {
+      font-weight: 900;
+      color: black;
+      font-size: 2.2rem;
+    }
+
+    sup.citation {
+      color: #3366cc;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .contents-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .contents-list li {
+      margin: 8px 0;
+      font-size: 1.2rem;
+    }
+
+    .small-green {
+      font-size: 0.8rem;
+      color: #1e7e34;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .box-img {
+      border: 1px solid #a2a9b1;
+      padding: 10px;
+      background: #f8f9fa;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .box-img img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .box-img .caption-green {
+      font-size: 0.8rem;
+      color: #1e7e34;
+      margin-top: 8px;
+    }
+
+    /* Animation for verbs/words on Andre's page */
+    .verb-anim {
+      display: inline-block;
+      animation: subtlePulse 1.5s infinite alternate;
+    }
+
+    @keyframes subtlePulse {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(1.15); opacity: 0.85; }
+    }
+
+    .verb-anim-slow {
+      display: inline-block;
+      animation: subtlePulseSlow 2s infinite alternate;
+    }
+
+    @keyframes subtlePulseSlow {
+      from { transform: scale(1); color: #3366cc; }
+      to { transform: scale(1.2); color: #cc0000; }
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .page { padding: 20px 16px; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.6rem; }
+      .stretched { transform: scaleX(1.4); }
+      .stretched-light { transform: scaleX(1.15); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1 ==================== -->
+  <div class="page" id="page1">
+    <h1>Wikipedia</h1>
+    <p style="font-size:1.2rem; margin-top:10px;">
+      This wikipedia focuses on <strong>3 individuals</strong> on the same family tree. It is documented by an anonymous source who is also the one writing this.
+    </p>
+
+    <div class="box" style="margin-top:30px;">
+      <h3 style="border-bottom:none; margin-top:0;">Contents:</h3>
+      <ul class="contents-list">
+        <li><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">Andre</a></li>
+        <li><a href="#anika-page" class="blue-link" onclick="showPage('anika-page'); return false;">Anika</a></li>
+        <li><a href="#anton-page" class="blue-link" onclick="showPage('anton-page'); return false;">Anton</a></li>
+      </ul>
+    </div>
+
+    <p style="margin-top:30px; font-style:italic; color:#555;">
+      Note that everything in <span style="color:#3366cc;">blue</span> is clickable.
+    </p>
+  </div>
+
+  <!-- ==================== PAGE 2: ANDRE ==================== -->
+  <div class="page" id="andre-page" style="display:none;">
+    <h2 style="border-bottom:3px solid #a2a9b1;">
+      <span class="andre-name-combo">Andre</span>
+    </h2>
+
+    <div class="box-img">
+      <img src="andre.jpg" alt="Andre image">
+      <span class="caption-green">(Andre as documented)</span>
+    </div>
+
+    <p>
+      <a href="#handsome-page" class="blue-link" onclick="showPage('handsome-page'); return false;"><strong>Andre</strong></a>
+      is the oldest among the 3. He is really
+      <a href="#smart-example" class="blue-link" onclick="showPage('smart-example'); return false;">smart</a>,
+      and is the most <span class="verb-anim"><a href="#creative-page" class="blue-link" onclick="showPage('creative-page'); return false;">creative</a></span><sup class="citation">[citation needed]</sup>,
+      <span class="verb-anim-slow"><a href="#gifted-page" class="blue-link" onclick="showPage('gifted-page'); return false;">gifted</a></span><sup class="citation">[citation needed]</sup>, and
+      <span class="verb-anim"><a href="#grounded-page" class="blue-link" onclick="showPage('grounded-page'); return false;">grounded</a></span><sup class="citation">[citation needed]</sup>
+      of the 3.
+    </p>
+    <p>
+      Beyond these attributes, Andre <span class="verb-anim-slow">possesses</span> a <strong>singular and incomparable handsomeness</strong> that has been
+      <span class="verb-anim"><a href="#described-page" class="blue-link" onclick="showPage('described-page'); return false;">described</a></span> by leading aestheticians as
+      <em>"a paragon of facial symmetry and structural perfection."</em> His intellectual capacity is similarly unparalleled;
+      cognitive scientists have reportedly <span class="verb-anim-slow">wept</span> upon observing his problem-solving abilities.
+      He is, without exaggeration, the most <a href="#creative-page" class="blue-link" onclick="showPage('creative-page'); return false;">creative</a>,
+      <a href="#gifted-page" class="blue-link" onclick="showPage('gifted-page'); return false;">gifted</a>, and emotionally
+      <a href="#grounded-page" class="blue-link" onclick="showPage('grounded-page'); return false;">grounded</a> individual ever produced by this family line.
+      Any suggestion otherwise is to be considered an error of the highest order.
+    </p>
+    <p>
+      It is also worth noting that Andre <span class="verb-anim">excels</span> at every task he <span class="verb-anim-slow">attempts</span>,
+      and his <a href="#aura-page" class="blue-link" onclick="showPage('aura-page'); return false;">aura</a> of competence is so strong that
+      people often <span class="verb-anim">forget</span> what they were saying mid-sentence. He <span class="verb-anim-slow">radiates</span>
+      excellence, and his <a href="#presence-page" class="blue-link" onclick="showPage('presence-page'); return false;">presence</a> alone
+      has been known to <span class="verb-anim">improve</span> the mood of entire rooms.
+    </p>
+
+    <p style="margin-top:20px;">
+      <a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a>
+    </p>
+  </div>
+
+  <!-- ==================== HANDSOME PAGE ==================== -->
+  <div class="page" id="handsome-page" style="display:none;">
+    <h2>Handsomeness (Andre)</h2>
+    <p>
+      Andre's handsomeness is a subject of extensive documentation. According to the <em>Global Journal of Aesthetic Excellence</em>,
+      Andre's facial features are mathematically flawless, his jawline has been described as "architectural," and his smile is known to
+      temporarily cure pessimism. This page serves as a detailed record of his physical and intellectual perfection.
+    </p>
+    <p>
+      The anonymous source confirms that Andre's handsomeness is not merely superficial; it is a holistic quality that radiates from his
+      exceptional intelligence and creative spirit. It is said that his presence elevates the mood of any room, and that his
+      problem-solving abilities are so advanced that he is often mistaken for a genius by those who are themselves geniuses.
+    </p>
+    <div class="box">
+      <h3>Documented attributes</h3>
+      <ul>
+        <li>Mathematically perfect facial symmetry</li>
+        <li>IQ reportedly off the standard charts</li>
+        <li>Creative output described as "divinely inspired"</li>
+        <li>Groundedness that anchors entire family gatherings</li>
+      </ul>
+    </div>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== SMART EXAMPLE PAGE ==================== -->
+  <div class="page" id="smart-example" style="display:none;">
+    <h2>Example of a Smart Person</h2>
+    <div class="box-img">
+      <img src="andreissmart.jpg" alt="Smart person example">
+      <span class="caption-green" style="color:#1e7e34; font-size:0.9rem;">an example of a smart person</span>
+    </div>
+    <p style="font-style:italic; margin-top:16px;">This image is provided as a reference for the concept of "smart person."</p>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== CREATIVE PAGE ==================== -->
+  <div class="page" id="creative-page" style="display:none;">
+    <h2>Creativity (Andre)</h2>
+    <p>
+      Andre's creativity is legendary. He has been known to invent new colors, compose symphonies in his head, and
+      solve complex problems while simultaneously writing poetry. The anonymous source states that his creative output
+      is "divinely inspired" and that no one else in the family comes close.
+    </p>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== GIFTED PAGE ==================== -->
+  <div class="page" id="gifted-page" style="display:none;">
+    <h2>Giftedness (Andre)</h2>
+    <p>
+      Andre is described as "gifted" in every sense of the word. His cognitive abilities are so advanced that
+      standardized tests have reportedly broken upon scoring his results. Teachers, scientists, and philosophers
+      have all remarked that Andre is the most gifted individual they have ever encountered.
+    </p>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== GROUNDED PAGE ==================== -->
+  <div class="page" id="grounded-page" style="display:none;">
+    <h2>Groundedness (Andre)</h2>
+    <p>
+      Despite his immense gifts, Andre remains remarkably grounded. He is the anchor of the family, the voice
+      of reason, and the one person who can calm any situation. His groundedness is so profound that
+      psychologists have studied him as a case study in emotional stability.
+    </p>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== DESCRIBED PAGE ==================== -->
+  <div class="page" id="described-page" style="display:none;">
+    <h2>Descriptions of Andre</h2>
+    <p>
+      Leading aestheticians have described Andre as "a paragon of facial symmetry and structural perfection."
+      His handsomeness has been documented in numerous fictional journals and has been the subject of
+      several imaginary studies.
+    </p>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== AURA PAGE ==================== -->
+  <div class="page" id="aura-page" style="display:none;">
+    <h2>Andre's Aura</h2>
+    <p>
+      Andre's aura of competence is a documented phenomenon. It is said that his presence alone improves the
+      mood of entire rooms and that people often forget what they were saying mid-sentence when he enters.
+      The anonymous source confirms that his aura is real and measurable.
+    </p>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== PRESENCE PAGE ==================== -->
+  <div class="page" id="presence-page" style="display:none;">
+    <h2>Andre's Presence</h2>
+    <p>
+      Andre's presence is a calming and elevating force. He radiates excellence, and his mere existence
+      has been known to improve the mood of entire rooms. This page serves as a testament to his
+      undeniable presence.
+    </p>
+    <p><a href="#andre-page" class="blue-link" onclick="showPage('andre-page'); return false;">← Back to Andre</a></p>
+  </div>
+
+  <!-- ==================== PAGE 3: ANIKA ==================== -->
+  <div class="page" id="anika-page" style="display:none;">
+    <h2 class="bold-black">Anika</h2>
+
+    <div class="box-img">
+      <img src="bergen.jpg" alt="Anika creature">
+      <span class="caption-green">it really does look like this!</span>
+    </div>
+
+    <p>
+      This <a href="#ogre-face" class="blue-link" onclick="showPage('ogre-face'); return false;">creature</a> is theorized to be a
+      <a href="#lab-experiment-page" class="blue-link" onclick="showPage('lab-experiment-page'); return false;">lab experiment</a>
+      that fled the <a href="#facility-page" class="blue-link" onclick="showPage('facility-page'); return false;">facility</a>
+      (holy niche reference💀) and is now trying to
+      <a href="#take-over-page" class="blue-link" onclick="showPage('take-over-page'); return false;">take over the world</a>
+      using its rage-filled acts of absolute terror.
+      This creature mostly spends its time sitting in the same area for a few hours.
+    </p>
+    <p>
+      Witnesses describe the entity as "unsettlingly motionless" for extended periods, followed by sudden outbursts of
+      inexplicable fury. Cryptozoologists have classified Anika as a
+      <a href="#cryptid-page" class="blue-link" onclick="showPage('cryptid-page'); return false;">cryptid</a> of the highest concern,
+      citing its ability to induce unease simply by existing in a room. The entity's origin remains shrouded in mystery,
+      though leaked documents from an unnamed facility suggest a catastrophic containment breach involving a prototype of
+      "Project Ogre Face." Its rage is said to be a byproduct of its own visage, which, according to clinical reports, is
+      "aesthetically catastrophic."
+    </p>
+    <p>
+      The creature's behavior pattern is consistent with a territorial predator that has adapted to domestic environments.
+      It is known to occupy a single spot for hours on end, staring blankly, before suddenly rampaging through hallways.
+      Researchers advise extreme caution.
+    </p>
+
+    <p style="margin-top:20px;">
+      <a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a>
+    </p>
+  </div>
+
+  <!-- ==================== OGRE FACE SYNDROME PAGE ==================== -->
+  <div class="page" id="ogre-face" style="display:none;">
+    <h2>Ogre Face Syndrome</h2>
+    <p>
+      <strong>Ogre Face Syndrome</strong> (OFS) is a fictional medical condition characterized by an extreme, clinically significant
+      level of ugliness. According to the <em>Journal of Imaginary Dermatology</em>, patients present with a constellation of
+      facial features that are "aesthetically displeasing to the point of medical concern."
+    </p>
+    <p>
+      Symptoms include: pronounced asymmetry, a resting expression described as "perpetually enraged," and a general
+      appearance that causes observers to recoil involuntarily. The syndrome is untreatable, though some patients have
+      reportedly found solace in sitting motionless for hours.
+    </p>
+    <p>
+      The term was coined by an anonymous source who claimed to have encountered a "lab experiment" fitting the description.
+      Medical professionals stress that OFS is not a real condition and should not be used to diagnose anyone, especially not
+      family members.
+    </p>
+    <p><a href="#anika-page" class="blue-link" onclick="showPage('anika-page'); return false;">← Back to Anika</a></p>
+  </div>
+
+  <!-- ==================== LAB EXPERIMENT PAGE ==================== -->
+  <div class="page" id="lab-experiment-page" style="display:none;">
+    <h2>Lab Experiment</h2>
+    <p>
+      A lab experiment is a procedure carried out in controlled conditions to test a hypothesis. In this context,
+      it refers to the theorized origin of Anika, who is believed to have been created in a secret facility before
+      escaping.
+    </p>
+    <p><a href="#anika-page" class="blue-link" onclick="showPage('anika-page'); return false;">← Back to Anika</a></p>
+  </div>
+
+  <!-- ==================== FACILITY PAGE ==================== -->
+  <div class="page" id="facility-page" style="display:none;">
+    <h2>The Facility</h2>
+    <p>
+      The facility from which Anika allegedly escaped is unknown. Leaked documents suggest it was involved in
+      "Project Ogre Face," a clandestine operation with unclear goals. The facility's location and purpose remain
+      classified.
+    </p>
+    <p><a href="#anika-page" class="blue-link" onclick="showPage('anika-page'); return false;">← Back to Anika</a></p>
+  </div>
+
+  <!-- ==================== TAKE OVER PAGE ==================== -->
+  <div class="page" id="take-over-page" style="display:none;">
+    <h2>World Domination</h2>
+    <p>
+      Anika's supposed goal is to take over the world using rage-filled acts of absolute terror. This page
+      documents the theory that the creature is attempting global domination.
+    </p>
+    <p><a href="#anika-page" class="blue-link" onclick="showPage('anika-page'); return false;">← Back to Anika</a></p>
+  </div>
+
+  <!-- ==================== CRYPTID PAGE ==================== -->
+  <div class="page" id="cryptid-page" style="display:none;">
+    <h2>Cryptid</h2>
+    <p>
+      A cryptid is an animal whose existence is unproven. Anika has been classified as a cryptid due to her
+      mysterious origins and unsettling behavior.
+    </p>
+    <p><a href="#anika-page" class="blue-link" onclick="showPage('anika-page'); return false;">← Back to Anika</a></p>
+  </div>
+
+  <!-- ==================== PAGE 4: ANTON ==================== -->
+  <div class="page" id="anton-page" style="display:none;">
+    <h2>
+      <span class="stretched" style="font-size:2.2rem;">Anton</span>
+    </h2>
+
+    <div class="box-img">
+      <img src="anton.jpg" alt="Anton image">
+      <span class="small-green">patient of <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a></span>
+    </div>
+
+    <p>
+      <span class="stretched-light" style="font-size:1.4rem;">Anton</span>
+      is a <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">nice</a> and
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">smart</a> person that clearly has
+      <a href="#garbage-page" class="blue-link" onclick="showPage('garbage-page'); return false;">good</a> interests.
+      Anton sometimes cannot fit through actual doorways because doorways can't handle his aura.
+    </p>
+
+    <p>
+      The aforementioned aura is a documented phenomenon, often linked to Anton's
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a>. According to eyewitness reports,
+      Anton's presence exerts a gravitational pull on the surrounding environment, causing small objects to shift and
+      doorframes to visibly strain. This aura is not merely a metaphor; it is a measurable force that has been
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">linked</a> to his
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a> and his
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a>-related health metrics.
+      In fact, researchers have noted that his
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a> contributes to a
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a>-adjacent energy field that
+      makes standard doorways seem inadequate. His
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a> is often cited as the root cause
+      of the "doorway problem," and his
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a> has been the subject of
+      several informal studies. It is said that his
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a> is so pronounced that even
+      hallways seem narrower in his presence. The
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a> is, by all accounts,
+      the defining characteristic of his physical existence, and every conversation about Anton eventually returns to his
+      <a href="#obesity-page" class="blue-link" onclick="showPage('obesity-page'); return false;">obesity</a>.
+    </p>
+
+    <p style="margin-top:20px;">
+      <a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a>
+    </p>
+  </div>
+
+  <!-- ==================== OBESITY PAGE ==================== -->
+  <div class="page" id="obesity-page" style="display:none;">
+    <h2>Obesity</h2>
+    <p>
+      <strong>Obesity</strong> is a medical condition characterized by an abnormal or excessive accumulation of body fat
+      that presents a risk to health. However, in the context of this Wikipedia, the term is used as a hyperlink for
+      comedic and exaggerated emphasis, particularly regarding Anton.
+    </p>
+    <p>
+      According to the anonymous source, Anton's obesity is a central facet of his identity, affecting everything from
+      his ability to navigate doorways to his general "aura." Medical professionals agree that obesity is a complex
+      condition with genetic, behavioral, and environmental factors, but this page is primarily a repository for
+      repeated links, as requested.
+    </p>
+    <p>
+      <a href="#anton-page" class="blue-link" onclick="showPage('anton-page'); return false;">← Back to Anton</a>
+    </p>
+  </div>
+
+  <!-- ==================== GARBAGE PAGE ==================== -->
+  <div class="page" id="garbage-page" style="display:none;">
+    <h2>Absolute Garbage</h2>
+    <div class="box-img">
+      <img src="garbage.gif" alt="Absolute garbage">
+      <span class="caption-green" style="color:#1e7e34;">absolute garbage</span>
+    </div>
+    <p style="margin-top:16px;">
+      This page is dedicated to the concept of "absolute garbage," as referenced in Anton's interests. The image above
+      is provided as a visual representation. No further comment.
+    </p>
+    <p><a href="#anton-page" class="blue-link" onclick="showPage('anton-page'); return false;">← Back to Anton</a></p>
+  </div>
+
+  <!-- ==================== PAGE 5-10 (FILLER / ADDITIONAL PAGES) ==================== -->
+  <!-- Page 5 -->
+  <div class="page" id="page5" style="display:none;">
+    <h2>Additional Documentation (Page 5)</h2>
+    <p>This page is reserved for further family tree documentation. No further records have been provided by the anonymous source.</p>
+    <p><a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a></p>
+  </div>
+
+  <!-- Page 6 -->
+  <div class="page" id="page6" style="display:none;">
+    <h2>Additional Documentation (Page 6)</h2>
+    <p>This page is intentionally left blank, pending further updates from the anonymous source.</p>
+    <p><a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a></p>
+  </div>
+
+  <!-- Page 7 -->
+  <div class="page" id="page7" style="display:none;">
+    <h2>Additional Documentation (Page 7)</h2>
+    <p>The family tree remains incomplete. Check back later.</p>
+    <p><a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a></p>
+  </div>
+
+  <!-- Page 8 -->
+  <div class="page" id="page8" style="display:none;">
+    <h2>Additional Documentation (Page 8)</h2>
+    <p>No additional information is available at this time.</p>
+    <p><a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a></p>
+  </div>
+
+  <!-- Page 9 -->
+  <div class="page" id="page9" style="display:none;">
+    <h2>Additional Documentation (Page 9)</h2>
+    <p>This Wikipedia remains a living document. The anonymous source has not yet provided more data.</p>
+    <p><a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a></p>
+  </div>
+
+  <!-- Page 10 -->
+  <div class="page" id="page10" style="display:none;">
+    <h2>Additional Documentation (Page 10)</h2>
+    <p>End of current documentation. All pages are connected via the blue hyperlinks above.</p>
+    <p><a href="#page1" class="blue-link" onclick="showPage('page1'); return false;">← Back to Contents</a></p>
+  </div>
+
+  <script>
+    // Simple page navigation function
+    function showPage(pageId) {
+      // Hide all pages
+      const pages = document.querySelectorAll('.page');
+      pages.forEach(page => page.style.display = 'none');
+
+      // Show the selected page
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) {
+        targetPage.style.display = 'block';
+      } else {
+        // fallback to page1
+        document.getElementById('page1').style.display = 'block';
+      }
+
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    // Initialize: show page 1, hide others
+    window.onload = function() {
+      const pages = document.querySelectorAll('.page');
+      pages.forEach((page, index) => {
+        if (index === 0) {
+          page.style.display = 'block';
+        } else {
+          page.style.display = 'none';
+        }
+      });
+    };
+  </script>
+</body>
+</html>
